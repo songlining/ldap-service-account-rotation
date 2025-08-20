@@ -37,33 +37,41 @@ echo ""
 wait
 clear
 
+# Show LDAP directory structure
+echo -e "${BLUE}### Step 1: Explore LDAP Directory Structure${COLOR_RESET}"
+echo "Before we configure Vault, let's see what users and data exist in our LDAP directory:"
+echo ""
+echo "🔍 Showing all users in the people organizational unit:"
+pe "docker exec openldap ldapsearch -x -H ldap://localhost -b \"ou=people,dc=demo,dc=hashicorp,dc=com\" -D \"cn=admin,dc=demo,dc=hashicorp,dc=com\" -w admin123 \"(objectClass=person)\" cn dn"
+echo ""
+echo "📋 Notice we have several pre-configured users:"
+echo "  • vault-bind: The service account Vault will use to connect to LDAP"
+echo "  • service-account: A static account we'll manage with Vault" 
+echo "  • dynamic-user: A template user for dynamic credential generation"
+wait
+clear
+
 # Check Vault status
-echo -e "${BLUE}### Step 1: Verify Vault Status${COLOR_RESET}"
+echo -e "${BLUE}### Step 2: Verify Vault Status${COLOR_RESET}"
 pe "vault status"
 wait
 clear
 
 # Enable and show LDAP secrets engine
-echo -e "${BLUE}### Step 2: Enable LDAP Secrets Engine${COLOR_RESET}"
+echo -e "${BLUE}### Step 3: Enable LDAP Secrets Engine${COLOR_RESET}"
 echo "First, let's enable the LDAP secrets engine if it's not already enabled"
 pe "vault secrets list | grep ldap || vault secrets enable ldap"
 wait
 clear
 
 # Configure LDAP integration
-echo -e "${BLUE}### Step 3: Configure LDAP Integration${COLOR_RESET}"
+echo -e "${BLUE}### Step 4: Configure LDAP Integration${COLOR_RESET}"
 echo "This configures Vault to connect to our OpenLDAP server using a dedicated bind user"
 pe "vault write ldap/config \\
     binddn=\"cn=vault-bind,ou=people,dc=demo,dc=hashicorp,dc=com\" \\
     bindpass=\"vaultbind123\" \\
     url=\"ldap://openldap:389\" \\
     userdn=\"ou=people,dc=demo,dc=hashicorp,dc=com\""
-wait
-clear
-
-# Verify configuration
-echo -e "${BLUE}### Step 4: Verify LDAP Configuration${COLOR_RESET}"
-pe "vault read ldap/config"
 wait
 clear
 
@@ -113,6 +121,17 @@ clear
 
 # Create password policy
 echo -e "${BLUE}### Step 9: Create Password Policy${COLOR_RESET}"
+echo "Let's first examine the password policy we'll be applying:"
+pe "cat password-policy.hcl"
+echo ""
+echo "This policy ensures generated passwords have:"
+echo "  • Minimum 20 characters length"
+echo "  • At least 1 lowercase letter (a-z)"
+echo "  • At least 1 uppercase letter (A-Z)"
+echo "  • At least 1 number (0-9)"
+echo "  • At least 1 special character (!@#$%^&*)"
+echo ""
+echo "Now let's create this password policy in Vault:"
 pe "vault write sys/policies/password/demo-policy policy=@password-policy.hcl"
 wait
 clear

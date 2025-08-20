@@ -17,13 +17,23 @@ docker exec openldap ldappasswd -s service123 -D "cn=admin,dc=demo,dc=hashicorp,
 
 # Clean up any dynamic users that might be left behind
 echo "  🧹 Cleaning up dynamic users..."
-docker exec openldap ldapsearch -x -H ldap://localhost -b "ou=people,dc=demo,dc=hashicorp,dc=com" -D "cn=admin,dc=demo,dc=hashicorp,dc=com" -w admin123 "(cn=v_token_*)" dn 2>/dev/null | grep "^dn:" | while read line; do
-    user_dn=$(echo $line | cut -d' ' -f2-)
-    if [[ "$user_dn" == *"v_token_"* ]]; then
+# Get all dynamic user DNs, handling LDAP line continuations properly
+temp_file=$(mktemp)
+docker exec openldap ldapsearch -x -H ldap://localhost -b "ou=people,dc=demo,dc=hashicorp,dc=com" -D "cn=admin,dc=demo,dc=hashicorp,dc=com" -w admin123 "(cn=v_token_*)" dn 2>/dev/null | \
+    sed '/^$/d' | \
+    awk '/^dn:/ { if (dn) print dn; dn=$0; next } /^ / { dn=dn substr($0,2); next } { if (dn) print dn; dn="" }; END { if (dn) print dn }' | \
+    sed 's/^dn: //' > "$temp_file"
+
+# Delete each dynamic user
+while IFS= read -r user_dn; do
+    if [[ -n "$user_dn" && "$user_dn" == *"v_token_"* ]]; then
         echo "    🗑️  Removing dynamic user: $user_dn"
         docker exec openldap ldapdelete -D "cn=admin,dc=demo,dc=hashicorp,dc=com" -w admin123 "$user_dn" 2>/dev/null
     fi
-done
+done < "$temp_file"
+
+# Clean up temp file
+rm -f "$temp_file"
 
 # Revoke any active dynamic credential leases
 echo "  🔓 Revoking active leases..."
