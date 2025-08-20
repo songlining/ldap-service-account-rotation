@@ -1,0 +1,35 @@
+dn: ou=people,dc=demo,dc=hashicorp,dc=com
+objectClass: organizationalUnit
+ou: people
+
+dn: ou=groups,dc=demo,dc=hashicorp,dc=com
+objectClass: organizationalUnit
+ou: groups
+
+dn: cn=vault-bind,ou=people,dc=demo,dc=hashicorp,dc=com
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+objectClass: simpleSecurityObject
+cn: vault-bind
+sn: vault-bind
+userPassword: vaultbind123
+uid: vault-bind
+
+dn: cn=service-account,ou=people,dc=demo,dc=hashicorp,dc=com
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: service-account
+sn: service-account
+userPassword: service123
+uid: service-account
+
+dn: cn=dynamic-user,ou=people,dc=demo,dc=hashicorp,dc=com
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: dynamic-user
+sn: dynamic-user
+userPassword: dynamic123
+uid: dynamic-user

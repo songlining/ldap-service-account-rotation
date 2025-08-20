@@ -1,0 +1,8 @@
+dn: cn={{.Username}},ou=people,dc=demo,dc=hashicorp,dc=com
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: {{.Username}}
+sn: {{.Username}}
+userPassword: {{.Password}}
+uid: {{.Username}}
