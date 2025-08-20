@@ -46,6 +46,12 @@ make demo
 make verify
 ```
 
+### 5. Before run the demo again
+```bash
+# Run the interactive demo
+make reset
+```
+
 ## 📁 Project Structure
 
 ```
