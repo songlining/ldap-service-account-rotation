@@ -46,7 +46,7 @@ pe "docker exec openldap ldapsearch -x -H ldap://localhost -b \"ou=people,dc=dem
 echo ""
 echo "📋 Notice we have several pre-configured users:"
 echo "  • vault-bind: The service account Vault will use to connect to LDAP"
-echo "  • service-account: A static account we'll manage with Vault" 
+echo "  • static-account: A static account we'll manage with Vault" 
 echo "  • dynamic-user: A template user for dynamic credential generation"
 wait
 clear
@@ -140,25 +140,25 @@ clear
 echo -e "${BLUE}### Step 10: Configure Static Role${COLOR_RESET}"
 echo "Using our properly configured vault-bind user for static role management"
 echo "The vault-bind user has the necessary LDAP ACLs to manage service account passwords"
-pe "vault write ldap/static-role/service-account dn=\"cn=service-account,ou=people,dc=demo,dc=hashicorp,dc=com\" username=\"service-account\" rotation_period=\"60s\""
+pe "vault write ldap/static-role/static-account dn=\"cn=static-account,ou=people,dc=demo,dc=hashicorp,dc=com\" username=\"static-account\" rotation_period=\"60s\""
 wait
 clear
 
 # Read static role credentials
 echo -e "${BLUE}### Step 11: Read Static Role Credentials${COLOR_RESET}"
-pe "vault read ldap/static-cred/service-account"
+pe "vault read ldap/static-cred/static-account"
 wait
 clear
 
 # Manual static role rotation
 echo -e "${BLUE}### Step 12: Manual Static Role Rotation${COLOR_RESET}"
-pe "vault write -f ldap/rotate-role/service-account"
+pe "vault write -f ldap/rotate-role/static-account"
 wait
 clear
 
 # Read credentials after rotation
 echo -e "${BLUE}### Step 13: Read Credentials After Manual Rotation${COLOR_RESET}"
-pe "vault read ldap/static-cred/service-account"
+pe "vault read ldap/static-cred/static-account"
 wait
 clear
 

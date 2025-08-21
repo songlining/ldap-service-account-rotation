@@ -100,7 +100,7 @@ make reset
 |------|----|---------| 
 | **admin** | `cn=admin,dc=demo,dc=hashicorp,dc=com` | LDAP administrator (setup only) |
 | **vault-bind** | `cn=vault-bind,ou=people,dc=demo,dc=hashicorp,dc=com` | Vault binding account with ACLs |
-| **service-account** | `cn=service-account,ou=people,dc=demo,dc=hashicorp,dc=com` | Static role demo |
+| **static-account** | `cn=static-account,ou=people,dc=demo,dc=hashicorp,dc=com` | Static role demo |
 | **dynamic-user** | `cn=dynamic-user,ou=people,dc=demo,dc=hashicorp,dc=com` | Template for dynamic roles |
 
 ### 🔐 LDAP Security Configuration
@@ -150,10 +150,10 @@ vault read ldap/config
 vault list ldap/static-role
 
 # Read static role credentials
-vault read ldap/static-cred/service-account
+vault read ldap/static-cred/static-account
 
 # Rotate static role manually
-vault write -f ldap/rotate-role/service-account
+vault write -f ldap/rotate-role/static-account
 
 # Generate dynamic credentials
 vault read ldap/creds/dynamic-role
@@ -171,7 +171,7 @@ docker exec openldap ldapsearch -x -H ldap://localhost \
 
 # Test user authentication
 docker exec openldap ldapwhoami -x \
-  -D "cn=service-account,ou=people,dc=demo,dc=hashicorp,dc=com" \
+  -D "cn=static-account,ou=people,dc=demo,dc=hashicorp,dc=com" \
   -w <current_password>
 
 # Check user details

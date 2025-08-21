@@ -11,9 +11,9 @@ echo "🔄 Resetting demo environment..."
 echo "  📝 Resetting vault-bind password..."
 docker exec openldap ldappasswd -s vaultbind123 -D "cn=admin,dc=demo,dc=hashicorp,dc=com" -w admin123 "cn=vault-bind,ou=people,dc=demo,dc=hashicorp,dc=com" 2>/dev/null
 
-# Reset service-account password in LDAP  
-echo "  📝 Resetting service-account password..."
-docker exec openldap ldappasswd -s service123 -D "cn=admin,dc=demo,dc=hashicorp,dc=com" -w admin123 "cn=service-account,ou=people,dc=demo,dc=hashicorp,dc=com" 2>/dev/null
+# Reset static-account password in LDAP  
+echo "  📝 Resetting static-account password..."
+docker exec openldap ldappasswd -s static123 -D "cn=admin,dc=demo,dc=hashicorp,dc=com" -w admin123 "cn=static-account,ou=people,dc=demo,dc=hashicorp,dc=com" 2>/dev/null
 
 # Clean up any dynamic users that might be left behind
 echo "  🧹 Cleaning up dynamic users..."
@@ -48,7 +48,7 @@ done
 echo "  🔧 Resetting Vault configurations..."
 
 # Remove existing roles and policies
-vault delete ldap/static-role/service-account 2>/dev/null
+vault delete ldap/static-role/static-account 2>/dev/null
 vault delete ldap/role/dynamic-role 2>/dev/null
 vault delete sys/policies/password/demo-policy 2>/dev/null
 

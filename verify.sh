@@ -53,10 +53,10 @@ fi
 # Check if static role exists
 echo ""
 echo "👤 Static Role Status:"
-if vault list ldap/static-role 2>/dev/null | grep -q "service-account"; then
-    echo "✅ Static role 'service-account' exists"
+if vault list ldap/static-role 2>/dev/null | grep -q "static-account"; then
+    echo "✅ Static role 'static-account' exists"
 else
-    echo "⚠️  Static role 'service-account' not found (may not be configured yet)"
+    echo "⚠️  Static role 'static-account' not found (may not be configured yet)"
 fi
 
 # Check if dynamic role exists

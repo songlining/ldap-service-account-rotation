@@ -16,14 +16,14 @@ sn: vault-bind
 userPassword: vaultbind123
 uid: vault-bind
 
-dn: cn=service-account,ou=people,dc=demo,dc=hashicorp,dc=com
+dn: cn=static-account,ou=people,dc=demo,dc=hashicorp,dc=com
 objectClass: person
 objectClass: organizationalPerson
 objectClass: inetOrgPerson
-cn: service-account
-sn: service-account
-userPassword: service123
-uid: service-account
+cn: static-account
+sn: static-account
+userPassword: static123
+uid: static-account
 
 dn: cn=dynamic-user,ou=people,dc=demo,dc=hashicorp,dc=com
 objectClass: person

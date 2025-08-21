@@ -58,14 +58,14 @@ sn: vault-bind
 userPassword: vaultbind123
 uid: vault-bind
 
-dn: cn=service-account,ou=people,dc=demo,dc=hashicorp,dc=com
+dn: cn=static-account,ou=people,dc=demo,dc=hashicorp,dc=com
 objectClass: person
 objectClass: organizationalPerson
 objectClass: inetOrgPerson
-cn: service-account
-sn: service-account
-userPassword: service123
-uid: service-account
+cn: static-account
+sn: static-account
+userPassword: static123
+uid: static-account
 
 dn: cn=dynamic-user,ou=people,dc=demo,dc=hashicorp,dc=com
 objectClass: person
@@ -80,7 +80,7 @@ EOF
 # Set proper passwords using ldappasswd for better password hashing
 echo -e "${YELLOW}🔐 Setting secure passwords...${NC}"
 docker exec openldap ldappasswd -s vaultbind123 -D "cn=admin,dc=demo,dc=hashicorp,dc=com" -w admin123 "cn=vault-bind,ou=people,dc=demo,dc=hashicorp,dc=com"
-docker exec openldap ldappasswd -s service123 -D "cn=admin,dc=demo,dc=hashicorp,dc=com" -w admin123 "cn=service-account,ou=people,dc=demo,dc=hashicorp,dc=com"
+docker exec openldap ldappasswd -s static123 -D "cn=admin,dc=demo,dc=hashicorp,dc=com" -w admin123 "cn=static-account,ou=people,dc=demo,dc=hashicorp,dc=com"
 docker exec openldap ldappasswd -s dynamic123 -D "cn=admin,dc=demo,dc=hashicorp,dc=com" -w admin123 "cn=dynamic-user,ou=people,dc=demo,dc=hashicorp,dc=com"
 
 echo -e "${GREEN}✅ LDAP users created successfully!${NC}"
