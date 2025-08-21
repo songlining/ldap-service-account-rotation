@@ -46,11 +46,17 @@ make demo
 make verify
 ```
 
-### 5. Before run the demo again
+### 5. Reset Environment (Before Running Demo Again)
 ```bash
-# Run the interactive demo
+# Reset environment for clean demo runs
 make reset
 ```
+
+The reset command:
+- Restores original LDAP user passwords
+- Cleans up dynamic users from LDAP
+- Revokes all active credential leases
+- Resets Vault LDAP configuration
 
 ## 📁 Project Structure
 
@@ -58,12 +64,14 @@ make reset
 ├── docker-compose.yml      # Container orchestration
 ├── vault-init.sh          # Vault and LDAP initialization
 ├── demo.sh                # Interactive demo script
+├── reset-demo.sh          # Reset environment script
 ├── password-policy.hcl     # Vault password policy
 ├── users.ldif             # LDAP users definition
+├── creation.ldif          # Dynamic user creation template
+├── deletion.ldif          # Dynamic user deletion template
 ├── verify.sh              # Environment verification
 ├── cleanup.sh             # Cleanup script
 ├── Makefile               # Convenient commands
-├── .env                   # Environment variables
 └── README.md              # This file
 ```
 
@@ -117,21 +125,24 @@ This follows security best practices by using a **dedicated service account** wi
 
 The interactive demo (`./demo.sh`) demonstrates:
 
-1. **Vault Status Verification** - Confirm Vault is running
-2. **LDAP Secrets Engine** - Show enabled LDAP engine
-3. **LDAP Integration** - Configure Vault to connect to OpenLDAP
-4. **Configuration Verification** - Verify LDAP settings
+1. **Explore LDAP Directory Structure** - Show existing users in LDAP
+2. **Verify Vault Status** - Confirm Vault is running and accessible
+3. **Enable LDAP Secrets Engine** - Configure LDAP secrets engine
+4. **Configure LDAP Integration** - Connect Vault to OpenLDAP server
 5. **Root Credential Rotation** - Rotate bind account password
-6. **Schedule-based Rotation** - Configure automatic rotation with password policy
-7. **Password Policy Creation** - Define password complexity rules
-8. **Static Role Configuration** - Create managed service account
-9. **Static Credential Reading** - Retrieve current password
-10. **Manual Static Rotation** - Trigger immediate rotation
-11. **Post-rotation Verification** - Confirm new password
-12. **Dynamic Role Configuration** - Create temporary user template
-13. **Dynamic Credential Generation** - Create temporary users
-14. **Multiple Dynamic Users** - Show multiple user creation
-15. **Lease Management** - Display active credential leases
+6. **Verify Root Credential Rotation** - Confirm rotation succeeded
+7. **Confirm Password Has Changed** - Test old password fails
+8. **Schedule-based Root Credential Rotation** - Configure automatic rotation
+9. **Create Password Policy** - Define password complexity rules
+10. **Configure Static Role** - Create managed service account
+11. **Read Static Role Credentials** - Retrieve current password
+12. **Manual Static Role Rotation** - Trigger immediate rotation
+13. **Read Credentials After Manual Rotation** - Confirm new password
+14. **Configure Dynamic Role** - Create temporary user template
+15. **Generate Dynamic Credentials** - Create temporary users
+16. **Generate Another Dynamic Credential** - Show multiple user creation
+17. **Show Dynamic Users in LDAP** - Display created users in LDAP directory
+18. **Inspect Active Lease Details** - Examine non-expired credential leases
 
 ## 🔧 Manual Commands
 
@@ -178,6 +189,12 @@ docker exec openldap ldapwhoami -x \
 docker exec openldap ldapsearch -x -H ldap://localhost \
   -b "ou=people,dc=demo,dc=hashicorp,dc=com" \
   -D "cn=admin,dc=demo,dc=hashicorp,dc=com" -w admin123
+
+# Search for dynamic users created by Vault
+docker exec openldap ldapsearch -x -H ldap://localhost \
+  -b "ou=people,dc=demo,dc=hashicorp,dc=com" \
+  -D "cn=admin,dc=demo,dc=hashicorp,dc=com" -w admin123 \
+  "(cn=v_token_*)" cn dn
 ```
 
 ## 📊 Available Make Commands
@@ -188,6 +205,7 @@ make start          # Start Docker containers
 make stop           # Stop Docker containers  
 make init           # Initialize Vault and LDAP
 make demo           # Run interactive demo
+make reset          # Reset environment for clean demo runs
 make verify         # Verify environment
 make clean          # Clean up everything
 make setup          # Complete setup (start + init)
