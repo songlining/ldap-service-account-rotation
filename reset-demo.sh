@@ -37,12 +37,21 @@ rm -f "$temp_file"
 
 # Revoke any active dynamic credential leases
 echo "  🔓 Revoking active leases..."
-vault list sys/leases/lookup/ldap/creds/dynamic-role 2>/dev/null | tail -n +3 | while read lease; do
-    if [[ ! -z "$lease" && "$lease" != "Keys" && "$lease" != "----" ]]; then
-        echo "    🔓 Revoking lease: $lease"
-        vault lease revoke "ldap/creds/dynamic-role/$lease" 2>/dev/null
-    fi
-done
+lease_list=$(vault list -format=json sys/leases/lookup/ldap/creds/dynamic-role 2>/dev/null)
+if [[ "$lease_list" != "null" && "$lease_list" != "" ]]; then
+    echo "$lease_list" | jq -r '.[]?' 2>/dev/null | while read lease; do
+        if [[ ! -z "$lease" ]]; then
+            echo "    🔓 Revoking lease: $lease"
+            vault lease revoke "ldap/creds/dynamic-role/$lease" 2>/dev/null || true
+        fi
+    done
+else
+    echo "    ℹ️  No active leases found"
+fi
+
+# Force revoke all leases under the ldap path as a fallback
+echo "  🧹 Force revoking all LDAP leases..."
+vault lease revoke -prefix ldap/ 2>/dev/null || true
 
 # Delete and recreate Vault configurations to ensure clean state
 echo "  🔧 Resetting Vault configurations..."
