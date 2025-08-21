@@ -189,7 +189,7 @@ clear
 
 echo ""
 echo -e "${GREEN}╔═══════════════════════════════════════════════════════════════╗"
-echo "║                     Demo Complete! 🎉                        ║"
+echo "║                     Demo Complete! 🎉                         ║"
 echo "║                                                               ║"
 echo "║  You've successfully demonstrated:                            ║"
 echo "║  • LDAP integration with Vault                                ║"
